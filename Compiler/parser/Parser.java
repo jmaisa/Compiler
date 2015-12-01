@@ -1,5 +1,5 @@
 package parser;
-
+// Teste de Commit
 import inter.Access;
 import inter.And;
 import inter.Arith;
