@@ -224,11 +224,11 @@ public class Parser {
 			error(t.toString() + " undeclared");
 
 		if (look.tag == ':') { // S -> id = E ;
-			move();
+			move(); match('=');
 			stmt = new Set(id, bool());
 		} else { // S -> L = E ;
 			Access x = offset(id);
-			match('=');
+			match(':'); move(); match('=');
 			stmt = new SetElem(x, bool());
 		}
 		match(';');
