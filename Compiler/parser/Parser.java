@@ -1,4 +1,5 @@
 package parser;
+
 // Teste de Commit
 import inter.Access;
 import inter.And;
@@ -35,7 +36,7 @@ public class Parser {
 
 	private Lexer	lex;			// lexical analyzer for this parser
 	private Token	look;			// lookahead tagen
-	Env				top		= null; // current or top symbol table
+	Env				top		= null;	// current or top symbol table
 	int				used	= 0;	// storage used for declarations
 
 	public Parser(Lexer l) throws IOException {
@@ -59,7 +60,7 @@ public class Parser {
 	}
 
 	public void program() throws IOException { // program -> block
-		Stmt s = block();
+		Stmt s = inicio(); // Stmt s = block();
 		int begin = s.newlabel();
 		int after = s.newlabel();
 		s.emitlabel(begin);
@@ -69,9 +70,6 @@ public class Parser {
 
 	Stmt block() throws IOException { // block -> { decls stmts }
 		match('{');
-		// match(Tag.PROGRAM);
-		// match(Tag.ID);
-		// match(';');
 		// match(Tag.BEGIN);
 		Env savedEnv = top;
 		top = new Env(top);
@@ -83,20 +81,35 @@ public class Parser {
 		return s;
 	}
 
-	/*
-	 * Stmt ini() throws IOException { //TODO TESTE block -> { decls stmts }
-	 * match(Tag.PROGRAM); Env savedEnv = top; top = new Env(top); decls(); Stmt
-	 * s = stmts(); match(Tag.END); match('.'); top = savedEnv; return s; }
-	 */
+	Stmt inicio() throws IOException { // TODO TESTE block -> { decls stmts }
+		match(Tag.PROGRAM);
+		match(Tag.ID);
+		match(';');
+		Env savedEnv = top;
+		top = new Env(top);
+		decls();
+		Stmt s = block();
+	//	match(Tag.END);
+	//	match('.');
+		top = savedEnv;
+		return s;
+	}
 
-	/*
-	 * TODO TESTE Stmt block() throws IOException { // block -> { decls stmts }
-	 * match(Tag.BEGIN); Env savedEnv = top; top = new Env(top); decls(); Stmt s
-	 * = stmts(); match(Tag.END); match('.'); top = savedEnv; return s; }
-	 */
+	// TODO TESTE
+//	Stmt block() throws IOException { // block -> { decls stmts }
+//		match(Tag.BEGIN);
+//		Env savedEnv = top;
+//		top = new Env(top);
+//		decls();
+//		Stmt s = stmts();
+//		match(Tag.END);
+//		match('.');
+//		top = savedEnv;
+//		return s;
+//	}
 
 	void decls() throws IOException { // decls -> var
-		match(Tag.VAR); // teste
+		// match(Tag.VAR); // teste
 		while (look.tag == Tag.BASIC) { // D -> type ID ;
 			Type p = type();
 			Token tok = look;

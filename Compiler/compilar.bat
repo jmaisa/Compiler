@@ -3,7 +3,7 @@
 set JAVAPATH=C:\Program Files\Java\jdk1.8.0_40\bin
 
 :: NESTA VARIÁVEL COLOQUE O CAMINHO PRINCIPAL DO PROJETO
-set PROJECTPATH=C:\workspace_compilador\Compiler
+set PROJECTPATH=C:\workspace_compilador\compiler.git\Compiler
 
 :: AQUI LIMPA OS ARQUIVOS GERADOS CASO JÁ TENHA COMPILADO ANTES
 del /q/a/s/f "%PROJECTPATH%\lexer\*.class"
