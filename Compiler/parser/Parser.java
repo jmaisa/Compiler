@@ -109,15 +109,19 @@ public class Parser {
 	}
 
 	void decls() throws IOException { // decls -> var
-		// match(Tag.VAR); // teste
-		while (look.tag == Tag.BASIC) { // D -> type ID ;
+		if (look.tag == Tag.VAR)
+		{// teste
+		while (look.tag == Tag.ID) {//while (look.tag == Tag.BASIC) { // D -> type ID ;
+			match(Tag.ID);  //Type p = type();
+			match(':');     //Token tok = look;
+			Token tok = look;   //match(Tag.ID);
 			Type p = type();
-			Token tok = look;
-			match(Tag.ID);
+			
 			match(';');
 			Id id = new Id((Word) tok, p, used);
 			top.put(tok, id);
 			used = used + p.width;
+		}
 		}
 	}
 
@@ -224,11 +228,14 @@ public class Parser {
 			error(t.toString() + " undeclared");
 
 		if (look.tag == ':') { // S -> id = E ;
-			move(); match('=');
+			move(); 
+			// match('=');
 			stmt = new Set(id, bool());
 		} else { // S -> L = E ;
 			Access x = offset(id);
-			match(':'); move(); match('=');
+			match(':');
+			move();
+			match('=');
 			stmt = new SetElem(x, bool());
 		}
 		match(';');

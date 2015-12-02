@@ -26,6 +26,9 @@ public class Lexer {
 		reserve(new Word("program", Tag.PROGRAM));
 		reserve(new Word("begin", Tag.BEGIN));
 		reserve(new Word("end", Tag.END));
+		reserve(new Word("array", Tag.ARRAY));
+		reserve(new Word("of", Tag.OF));
+		reserve(new Word("var", Tag.VAR));
 
 		reserve(Word.True);
 		reserve(Word.False);
