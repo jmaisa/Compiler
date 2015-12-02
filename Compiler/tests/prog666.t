@@ -1,13 +1,15 @@
 program teste;
-{
+begin
 	int i; int j; float v; float x; float[100] a;
-	while( true ) {
-		do i = i+1; while( a[i] < v);
-		do j = j-1; while( a[j] > v);
-		if i >= j then i = i+j;
-		x = a[i]; a[i] = a[j]; a[j] = x;
-	}
-}
+	while (i > j)  do
+	begin
+		if i >= j then 
+			i := i[4];
+		else
+			j := j[5];
+		x := a[i];
+	end
+end.
 
 
 

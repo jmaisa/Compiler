@@ -50,7 +50,7 @@ public class Lexer {
 
 	public Token scan() throws IOException {
 		for (;; readch()) {
-			System.out.print(peek);
+//			System.out.print(peek);
 			if (peek == ' ' || peek == '\t')
 				continue;
 			else if (peek == '\n')

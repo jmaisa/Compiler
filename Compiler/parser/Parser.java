@@ -68,7 +68,7 @@ public class Parser {
 		s.emitlabel(after);
 	}
 
-	Stmt block() throws IOException { // block -> { decls stmts }
+/*	Stmt block() throws IOException { // block -> { decls stmts }
 		match('{');
 		// match(Tag.BEGIN);
 		Env savedEnv = top;
@@ -80,7 +80,7 @@ public class Parser {
 		top = savedEnv;
 		return s;
 	}
-
+*/
 	Stmt inicio() throws IOException { // TODO TESTE block -> { decls stmts }
 		match(Tag.PROGRAM);
 		match(Tag.ID);
@@ -89,24 +89,24 @@ public class Parser {
 		top = new Env(top);
 		decls();
 		Stmt s = block();
-	//	match(Tag.END);
-	//	match('.');
+//		match(Tag.END);
+		match('.');
 		top = savedEnv;
 		return s;
 	}
 
 	// TODO TESTE
-//	Stmt block() throws IOException { // block -> { decls stmts }
-//		match(Tag.BEGIN);
-//		Env savedEnv = top;
-//		top = new Env(top);
-//		decls();
-//		Stmt s = stmts();
-//		match(Tag.END);
+	Stmt block() throws IOException { // block -> { decls stmts }
+		match(Tag.BEGIN);
+		Env savedEnv = top;
+		top = new Env(top);
+		decls();
+		Stmt s = stmts();
+		match(Tag.END);
 //		match('.');
-//		top = savedEnv;
-//		return s;
-//	}
+		top = savedEnv;
+		return s;
+	}
 
 	void decls() throws IOException { // decls -> var
 		// match(Tag.VAR); // teste
@@ -142,7 +142,7 @@ public class Parser {
 	}
 
 	Stmt stmts() throws IOException {
-		if (look.tag == '}')
+		if (look.tag == Tag.END)
 			return Stmt.Null;
 		else
 			return new Seq(stmt(), stmts());
@@ -178,9 +178,10 @@ public class Parser {
 				savedStmt = Stmt.Enclosing;
 				Stmt.Enclosing = whilenode;
 				match(Tag.WHILE);
-				match('(');
+//				match('(');
 				x = bool();
-				match(')');
+//				match(')');
+				match(Tag.DO);
 				s1 = stmt();
 				whilenode.init(x, s1);
 				Stmt.Enclosing = savedStmt; // reset Stmt.Enclosing
@@ -206,8 +207,7 @@ public class Parser {
 				match(';');
 				return new Break();
 
-			case '{':
-				// TODO TESTE case Tag.BEGIN:
+			case Tag.BEGIN:
 				return block();
 
 			default:
@@ -223,7 +223,7 @@ public class Parser {
 		if (id == null)
 			error(t.toString() + " undeclared");
 
-		if (look.tag == '=') { // S -> id = E ;
+		if (look.tag == ':') { // S -> id = E ;
 			move();
 			stmt = new Set(id, bool());
 		} else { // S -> L = E ;
