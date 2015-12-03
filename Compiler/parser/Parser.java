@@ -100,7 +100,9 @@ public class Parser {
 		match(Tag.BEGIN);
 		Env savedEnv = top;
 		top = new Env(top);
-		decls();
+//		decls();
+		System.out.println("look= "+look);
+
 		Stmt s = stmts();
 		match(Tag.END);
 //		match('.');
@@ -111,16 +113,21 @@ public class Parser {
 	void decls() throws IOException { // decls -> var
 		if (look.tag == Tag.VAR)
 		{// teste
+		move();
 		while (look.tag == Tag.ID) {//while (look.tag == Tag.BASIC) { // D -> type ID ;
+			Token tok = look;
+			System.out.println("tok= "+tok);
 			match(Tag.ID);  //Type p = type();
 			match(':');     //Token tok = look;
-			Token tok = look;   //match(Tag.ID);
+			//Token tok = look;   //match(Tag.ID);
+			//match(Tag.BASIC);
 			Type p = type();
 			
 			match(';');
 			Id id = new Id((Word) tok, p, used);
 			top.put(tok, id);
 			used = used + p.width;
+			System.out.println("last= "+look);
 		}
 		}
 	}
@@ -135,6 +142,7 @@ public class Parser {
 	}
 
 	Type dims(Type p) throws IOException {
+	// ARRAY
 		match('[');
 		Token tok = look;
 		match(Tag.NUM);
@@ -206,6 +214,19 @@ public class Parser {
 				Stmt.Enclosing = savedStmt; // reset Stmt.Enclosing
 				return donode;
 
+/*
+ 			case Tag.FOR:
+ 				match(Tag.FOR);
+ 				Token tok = look; // variavel de incremento
+ 				assign();
+ 				match(Tag.TO);
+ 				expr();
+ 				match(Tag.DO);
+				s1 = stmt();
+				incremento
+				retorno do inicio do for
+
+ */
 			case Tag.BREAK:
 				match(Tag.BREAK);
 				match(';');
@@ -229,12 +250,12 @@ public class Parser {
 
 		if (look.tag == ':') { // S -> id = E ;
 			move(); 
-			// match('=');
+			match('=');
 			stmt = new Set(id, bool());
 		} else { // S -> L = E ;
 			Access x = offset(id);
 			match(':');
-			move();
+			//move();
 			match('=');
 			stmt = new SetElem(x, bool());
 		}

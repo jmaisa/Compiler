@@ -1,12 +1,12 @@
 program teste;
+	var i:int; j:int; v:float; x:float; 
 begin
-	int i; int j; float v; float x; float[100][200] a;
 	while (i > j)  do
 	begin
 		if i >= j then 
-			i := a[2][3];
+			i := 3;
 		else
-			j := x;
+			j := 2;
 		x := i;
 	end
 end.
