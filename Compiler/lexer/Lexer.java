@@ -29,6 +29,16 @@ public class Lexer {
 		reserve(new Word("array", Tag.ARRAY));
 		reserve(new Word("of", Tag.OF));
 		reserve(new Word("var", Tag.VAR));
+		reserve(new Word("for", Tag.FOR));
+		reserve(new Word("to", Tag.TO));
+		reserve(new Word("downto", Tag.DOWNTO));
+		reserve(new Word("case", Tag.CASE));
+		reserve(new Word("repeat", Tag.REPEAT));
+		reserve(new Word("until", Tag.UNTIL));
+		reserve(new Word("writeln", Tag.WRITELN));
+		reserve(new Word("readln", Tag.READLN));
+		reserve(new Word("function", Tag.FUNCTION));
+		reserve(new Word("procedure", Tag.PROCEDURE));
 
 		reserve(Word.True);
 		reserve(Word.False);
@@ -53,7 +63,7 @@ public class Lexer {
 
 	public Token scan() throws IOException {
 		for (;; readch()) {
-//			System.out.print(peek);
+			// System.out.print(peek);
 			if (peek == ' ' || peek == '\t')
 				continue;
 			else if (peek == '\n')
