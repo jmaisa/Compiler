@@ -13,6 +13,7 @@ import inter.Id;
 import inter.If;
 import inter.Not;
 import inter.Or;
+import inter.Readln;
 import inter.Rel;
 import inter.Seq;
 import inter.Set;
@@ -20,6 +21,8 @@ import inter.SetElem;
 import inter.Stmt;
 import inter.Unary;
 import inter.While;
+import inter.Writeln;
+import java.awt.image.LookupTable;
 
 import java.io.IOException;
 
@@ -68,19 +71,12 @@ public class Parser {
 		s.emitlabel(after);
 	}
 
-/*	Stmt block() throws IOException { // block -> { decls stmts }
-		match('{');
-		// match(Tag.BEGIN);
-		Env savedEnv = top;
-		top = new Env(top);
-		decls();
-		Stmt s = stmts();
-		match('}');
-		// match(Tag.END);
-		top = savedEnv;
-		return s;
-	}
-*/
+	/*
+	 * /* Stmt block() throws IOException { // block -> { decls stmts }
+	 * match('{'); // match(Tag.BEGIN); Env savedEnv = top; top = new Env(top);
+	 * decls(); Stmt s = stmts(); match('}'); // match(Tag.END); top = savedEnv;
+	 * return s; }
+	 */
 	Stmt inicio() throws IOException { // TODO TESTE block -> { decls stmts }
 		match(Tag.PROGRAM);
 		match(Tag.ID);
@@ -89,60 +85,64 @@ public class Parser {
 		top = new Env(top);
 		decls();
 		Stmt s = block();
-//		match(Tag.END);
+		// match(Tag.END);
 		match('.');
 		top = savedEnv;
 		return s;
 	}
 
-	// TODO TESTE
 	Stmt block() throws IOException { // block -> { decls stmts }
 		match(Tag.BEGIN);
 		Env savedEnv = top;
 		top = new Env(top);
-//		decls();
-		System.out.println("look= "+look);
+		// decls();
+		System.out.println("look= " + look);
 
 		Stmt s = stmts();
 		match(Tag.END);
-//		match('.');
+		// match('.');
 		top = savedEnv;
 		return s;
 	}
 
 	void decls() throws IOException { // decls -> var
-		if (look.tag == Tag.VAR)
-		{// teste
-		move();
-		while (look.tag == Tag.ID) {//while (look.tag == Tag.BASIC) { // D -> type ID ;
-			Token tok = look;
-			System.out.println("tok= "+tok);
-			match(Tag.ID);  //Type p = type();
-			match(':');     //Token tok = look;
-			//Token tok = look;   //match(Tag.ID);
-			//match(Tag.BASIC);
-			Type p = type();
-			
-			match(';');
-			Id id = new Id((Word) tok, p, used);
-			top.put(tok, id);
-			used = used + p.width;
-			System.out.println("last= "+look);
-		}
+		if (look.tag == Tag.VAR) {// teste
+			move();
+			while (look.tag == Tag.ID) {// while (look.tag == Tag.BASIC) { // D
+										// -> type ID ;
+				Token tok = look;
+				System.out.println("tok= " + tok);
+				match(Tag.ID); // Type p = type();
+				match(':'); // Token tok = look;
+				Type p = type();
+
+				match(';');
+				Id id = new Id((Word) tok, p, used);
+				top.put(tok, id);
+				used = used + p.width;
+				System.out.println("last= " + look);
+			}
 		}
 	}
 
 	Type type() throws IOException {
+
 		Type p = (Type) look; // expect look.tag == Tag.BASIC
-		match(Tag.BASIC);
-		if (look.tag != '[')
-			return p; // T -> basic
+
+		 match(Tag.BASIC);
+		 if (look.tag != '[')
+		 return p; // T -> basic
+		 else
+		 return dims(p); // return array type
+
+	/*	if (look.tag == Tag.ARRAY)
+			return dims(p);
 		else
-			return dims(p); // return array type
+			return p; // T -> basic  */
 	}
 
 	Type dims(Type p) throws IOException {
-	// ARRAY
+		// ARRAY
 		match('[');
 		Token tok = look;
 		match(Tag.NUM);
@@ -162,7 +162,7 @@ public class Parser {
 
 	Stmt stmt() throws IOException {
 		Expr x;
-		Stmt s, s1, s2;
+		Stmt s, s1, s2, s3, s4;
 		Stmt savedStmt; // save enclosing loop for breaks
 
 		switch (look.tag) {
@@ -174,10 +174,8 @@ public class Parser {
 			case Tag.IF:
 				// TODO TESTE match(Tag.IF); x = bool(); match('Tag.THEN');
 				match(Tag.IF);
-				// match('(');
 				x = bool();
-				// match(')');
-				match(Tag.THEN); // teste
+				match(Tag.THEN);
 				s1 = stmt();
 				if (look.tag != Tag.ELSE)
 					return new If(x, s1);
@@ -190,43 +188,85 @@ public class Parser {
 				savedStmt = Stmt.Enclosing;
 				Stmt.Enclosing = whilenode;
 				match(Tag.WHILE);
-//				match('(');
+				// match('(');
 				x = bool();
-//				match(')');
+				// match(')');
 				match(Tag.DO);
 				s1 = stmt();
 				whilenode.init(x, s1);
 				Stmt.Enclosing = savedStmt; // reset Stmt.Enclosing
 				return whilenode;
 
-			case Tag.DO: // ////////Repeat
+			case Tag.REPEAT: // ////////Repeat
 				Do donode = new Do();
 				savedStmt = Stmt.Enclosing;
 				Stmt.Enclosing = donode;
-				match(Tag.DO);
+				match(Tag.REPEAT);
 				s1 = stmt();
-				match(Tag.WHILE);
-				match('(');
+				match(Tag.UNTIL);
 				x = bool();
-				match(')');
 				match(';');
 				donode.init(s1, x);
 				Stmt.Enclosing = savedStmt; // reset Stmt.Enclosing
 				return donode;
 
-/*
- 			case Tag.FOR:
- 				match(Tag.FOR);
- 				Token tok = look; // variavel de incremento
- 				assign();
- 				match(Tag.TO);
- 				expr();
- 				match(Tag.DO);
-				s1 = stmt();
-				incremento
-				retorno do inicio do for
+			case Tag.PROCEDURE:
+				match(Tag.PROCEDURE);
+				match(Tag.ID);
+				match(';');
+				Env savedEnv = top;
+				top = new Env(top);
+				decls();
+				Stmt aux = block();
+				top = savedEnv;
+				return aux;
 
- */
+			case Tag.FUNCTION:
+				match(Tag.FUNCTION);
+				match(Tag.ID);
+				match(';');
+				Env saveEnv = top;
+				top = new Env(top);
+				decls();
+				Stmt block = block();
+				top = saveEnv;
+				return block;
+
+			/*
+			 * case Tag.FOR: 
+			 * match(Tag.FOR); 
+			 * Token tok = look; // variavel de incremento 
+			 * assign(); 
+			 * match(Tag.TO); 
+			 * expr(); num
+			 * match(Tag.DO); 
+			 * Env saveEnv = top;
+				top = new Env(top);
+				decls();
+				Stmt for = block();
+				top = saveEnv;
+				return new For("tok<num", stmt);
+                          // incremento retorno do inicio do for
+			 */
+
+
+			case Tag.WRITELN:
+                        case Tag.READLN:
+                                Writeln wrln = new Writeln();
+				//savedStmt = Stmt.Enclosing;
+				Stmt.Enclosing = wrln;
+                                String a = look.toString();
+                                move();
+                                match('(');
+                                String b = "";
+                                if (look.tag == Tag.ID) {
+                                    b = look.toString();
+                                    move();
+                                }
+                                match(')');
+                                wrln.gen(a,b);
+                                return wrln;
+                 
 			case Tag.BREAK:
 				match(Tag.BREAK);
 				match(';');
@@ -249,13 +289,13 @@ public class Parser {
 			error(t.toString() + " undeclared");
 
 		if (look.tag == ':') { // S -> id = E ;
-			move(); 
+			move();
 			match('=');
 			stmt = new Set(id, bool());
 		} else { // S -> L = E ;
 			Access x = offset(id);
 			match(':');
-			//move();
+			// move();
 			match('=');
 			stmt = new SetElem(x, bool());
 		}
